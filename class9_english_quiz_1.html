@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 9 English Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17; --surface: #1a1928; --card: #211f35;
+    --accent: #7c5cfc; --accent2: #f7b731;
+    --correct: #2ecc71; --wrong: #e74c3c;
+    --text: #fffffe; --muted: #a7a9be; --radius: 16px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  body::before { content:''; position:fixed; top:-200px; left:-200px; width:600px; height:600px; background:radial-gradient(circle,rgba(124,92,252,0.18) 0%,transparent 70%); pointer-events:none; z-index:0; }
+  body::after { content:''; position:fixed; bottom:-150px; right:-150px; width:500px; height:500px; background:radial-gradient(circle,rgba(247,183,49,0.12) 0%,transparent 70%); pointer-events:none; z-index:0; }
+  .container { max-width:680px; margin:0 auto; padding:24px 16px 80px; position:relative; z-index:1; }
+  .screen { display:none; animation:fadeUp 0.4s ease; }
+  .screen.active { display:block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .home-header { text-align:center; padding:40px 0 28px; }
+  .badge { display:inline-block; background:rgba(124,92,252,0.2); color:var(--accent); border:1px solid rgba(124,92,252,0.4); border-radius:50px; padding:6px 16px; font-size:13px; font-weight:600; letter-spacing:0.05em; margin-bottom:20px; }
+  .home-header h1 { font-family:'Sora',sans-serif; font-size:clamp(26px,6vw,40px); font-weight:800; line-height:1.15; margin-bottom:12px; }
+  .home-header h1 span { color:var(--accent); }
+  .home-header p { color:var(--muted); font-size:15px; line-height:1.6; max-width:440px; margin:0 auto 20px; }
+  .stats-row { display:flex; gap:10px; justify-content:center; margin-bottom:28px; flex-wrap:wrap; }
+  .stat-pill { background:var(--card); border:1px solid rgba(255,255,255,0.07); border-radius:50px; padding:8px 16px; font-size:13px; font-weight:600; color:var(--muted); }
+  .stat-pill span { color:var(--accent2); }
+
+  .chapter-grid { display:flex; flex-direction:column; gap:9px; }
+  .chapter-card { background:var(--card); border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius); padding:15px 17px; cursor:pointer; transition:all 0.25s ease; display:flex; align-items:center; gap:13px; }
+  .chapter-card:hover { border-color:var(--accent); background:rgba(124,92,252,0.1); transform:translateY(-2px); }
+  .chapter-num { width:40px; height:40px; border-radius:11px; background:rgba(124,92,252,0.2); display:flex; align-items:center; justify-content:center; font-family:'Sora',sans-serif; font-weight:700; font-size:14px; color:var(--accent); flex-shrink:0; }
+  .chapter-info { flex:1; }
+  .chapter-info h3 { font-family:'Sora',sans-serif; font-weight:700; font-size:14px; margin-bottom:3px; }
+  .chapter-info p { color:var(--muted); font-size:12px; }
+  .chapter-arrow { color:var(--muted); font-size:20px; flex-shrink:0; }
+
+  .quiz-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+  .back-btn { width:40px; height:40px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; flex-shrink:0; transition:background 0.2s; }
+  .back-btn:hover { background:rgba(255,255,255,0.1); }
+  .quiz-title { flex:1; }
+  .quiz-title h2 { font-family:'Sora',sans-serif; font-weight:700; font-size:15px; }
+  .quiz-title p { color:var(--muted); font-size:12px; }
+
+  .progress-bar { height:6px; background:rgba(255,255,255,0.08); border-radius:99px; margin-bottom:22px; overflow:hidden; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),#a78bfa); border-radius:99px; transition:width 0.4s ease; }
+
+  .question-card { background:var(--card); border:1px solid rgba(255,255,255,0.07); border-radius:var(--radius); padding:22px; margin-bottom:14px; }
+  .q-counter { font-size:12px; font-weight:600; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
+  .q-text { font-family:'Sora',sans-serif; font-size:16px; font-weight:600; line-height:1.5; }
+
+  .options { display:flex; flex-direction:column; gap:8px; }
+  .option-btn { background:var(--surface); border:1.5px solid rgba(255,255,255,0.08); border-radius:12px; padding:13px 15px; text-align:left; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--text); transition:all 0.2s ease; display:flex; align-items:center; gap:11px; }
+  .option-btn:hover:not(:disabled) { border-color:var(--accent); background:rgba(124,92,252,0.1); }
+  .option-letter { width:28px; height:28px; border-radius:8px; background:rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; flex-shrink:0; transition:all 0.2s; }
+  .option-btn.correct { border-color:var(--correct); background:rgba(46,204,113,0.12); }
+  .option-btn.correct .option-letter { background:var(--correct); color:#fff; }
+  .option-btn.wrong { border-color:var(--wrong); background:rgba(231,76,60,0.12); }
+  .option-btn.wrong .option-letter { background:var(--wrong); color:#fff; }
+  .option-btn:disabled { cursor:default; }
+
+  .feedback { border-radius:12px; padding:13px 15px; font-size:14px; font-weight:500; margin-bottom:12px; display:none; }
+  .feedback.correct { background:rgba(46,204,113,0.15); border:1px solid rgba(46,204,113,0.3); color:#2ecc71; display:flex; align-items:center; gap:8px; }
+  .feedback.wrong { background:rgba(231,76,60,0.15); border:1px solid rgba(231,76,60,0.3); color:#e74c3c; display:flex; align-items:center; gap:8px; }
+
+  .next-btn { width:100%; background:var(--accent); color:#fff; border:none; border-radius:12px; padding:15px; font-family:'Sora',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:opacity 0.2s,transform 0.1s; display:none; }
+  .next-btn:hover { opacity:0.9; }
+  .next-btn:active { transform:scale(0.98); }
+  .next-btn.visible { display:block; }
+
+  .result-screen { text-align:center; padding:40px 0; }
+  .result-emoji { font-size:60px; margin-bottom:16px; display:block; }
+  .result-screen h2 { font-family:'Sora',sans-serif; font-size:26px; font-weight:800; margin-bottom:8px; }
+  .result-screen>p { color:var(--muted); margin-bottom:26px; font-size:15px; }
+  .score-circle { width:130px; height:130px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 26px; }
+  .score-inner { width:100px; height:100px; border-radius:50%; background:var(--card); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .score-num { font-family:'Sora',sans-serif; font-size:28px; font-weight:800; color:var(--accent); }
+  .score-label { font-size:11px; color:var(--muted); }
+  .score-stats { display:flex; gap:10px; justify-content:center; margin-bottom:26px; }
+  .stat-box { background:var(--card); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px 18px; text-align:center; }
+  .stat-box .val { font-family:'Sora',sans-serif; font-size:20px; font-weight:700; }
+  .stat-box .lbl { font-size:11px; color:var(--muted); margin-top:2px; }
+  .stat-box.good .val { color:var(--correct); }
+  .stat-box.bad .val { color:var(--wrong); }
+  .result-btns { display:flex; flex-direction:column; gap:10px; max-width:300px; margin:0 auto; }
+  .btn-primary { background:var(--accent); color:#fff; border:none; border-radius:12px; padding:14px; font-family:'Sora',sans-serif; font-weight:700; font-size:15px; cursor:pointer; transition:opacity 0.2s; }
+  .btn-primary:hover { opacity:0.9; }
+  .btn-secondary { background:transparent; color:var(--muted); border:1.5px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px; font-family:'Sora',sans-serif; font-weight:600; font-size:15px; cursor:pointer; transition:all 0.2s; }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--text); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="screen active" id="homeScreen">
+    <div class="home-header">
+      <div class="badge">📚 Class 9 · English</div>
+      <h1>Master Your<br><span>English</span> Exam</h1>
+      <p>Practice chapter-wise MCQs from your Class 9 English textbook. Pick a chapter to begin.</p>
+      <div class="stats-row">
+        <div class="stat-pill"><span>16</span> Chapters</div>
+        <div class="stat-pill"><span>160</span> Questions</div>
+        <div class="stat-pill"><span>100%</span> Free</div>
+      </div>
+    </div>
+    <div class="chapter-grid" id="chapterGrid"></div>
+  </div>
+
+  <div class="screen" id="quizScreen">
+    <div class="quiz-header">
+      <div class="back-btn" onclick="goHome()">←</div>
+      <div class="quiz-title">
+        <h2 id="quizChapterName"></h2>
+        <p id="quizChapterSub"></p>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="question-card">
+      <div class="q-counter" id="qCounter"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="options" id="optionsContainer"></div>
+    <div style="margin-top:13px;">
+      <div class="feedback" id="feedbackBox"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>
+  </div>
+
+  <div class="screen" id="resultScreen">
+    <div class="result-screen">
+      <span class="result-emoji" id="resultEmoji"></span>
+      <h2 id="resultTitle"></h2>
+      <p id="resultSubtitle"></p>
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-inner">
+          <div class="score-num" id="scoreNum"></div>
+          <div class="score-label">score</div>
+        </div>
+      </div>
+      <div class="score-stats">
+        <div class="stat-box good"><div class="val" id="correctCount"></div><div class="lbl">Correct</div></div>
+        <div class="stat-box bad"><div class="val" id="wrongCount"></div><div class="lbl">Wrong</div></div>
+        <div class="stat-box"><div class="val" id="totalCount"></div><div class="lbl">Total</div></div>
+      </div>
+      <div class="result-btns">
+        <button class="btn-primary" id="retryBtn">🔄 Try Again</button>
+        <button class="btn-secondary" onclick="goHome()">← All Chapters</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const data = {"chapters":[{"chapter_number":1,"chapter_name":"Sense of Self","topics":["Mr. Moti","Girl","O Me! O Life!"],"questions":[{"question":"Who is the author of the story 'Mr. Moti'?","options":["A. Niaz Zaman","B. Rahad Abir","C. Walt Whitman","D. Jamaica Kincaid"],"correct":"B"},{"question":"How old is Ameen when the war breaks out?","options":["A. 15","B. 16","C. 17","D. 18"],"correct":"C"},{"question":"What is Moti in the story?","options":["A. A dog","B. A cat","C. A cockerel","D. A goat"],"correct":"C"},{"question":"What two major factors segregate people in society?","options":["A. Race and religion","B. Economy and education","C. Age and gender","D. Politics and culture"],"correct":"B"},{"question":"In 'Girl', what is 'benna'?","options":["A. A type of food","B. A traditional dress","C. A form of music/song","D. A religious ritual"],"correct":"C"},{"question":"Who is the speaker in 'Girl' addressing?","options":["A. A son","B. A daughter","C. A husband","D. A servant"],"correct":"B"},{"question":"Who wrote 'O Me! O Life!'?","options":["A. Robert Frost","B. Walt Whitman","C. John Keats","D. William Wordsworth"],"correct":"B"},{"question":"Central recurring question in 'O Me! O Life!'?","options":["A. Where is the light?","B. Why do we work?","C. What good amid these, O me, O life?","D. Who is more faithful?"],"correct":"C"},{"question":"What may one 'contribute' to life's powerful play?","options":["A. A song","B. A verse","C. A book","D. A story"],"correct":"B"},{"question":"Words like 'fill'd' and 'renew'd' are called?","options":["A. Metaphors","B. Contractions","C. Similes","D. Alliterations"],"correct":"B"}]},{"chapter_number":2,"chapter_name":"Climate Change","topics":["River Erosion","Pollution","3Rs"],"questions":[{"question":"Where does Meherjan live?","options":["A. Sirajgonj Town Protection Embankment slum","B. A village in Barisal","C. A coastal area in Khulna","D. Dhaka city"],"correct":"A"},{"question":"How many become homeless annually from river erosion in Bangladesh?","options":["A. 50,000","B. 100,000","C. 500,000","D. 1,000,000"],"correct":"B"},{"question":"Major source of air pollution in Bangladesh?","options":["A. Planting trees","B. Brick kilns","C. Using CNG","D. Recycling paper"],"correct":"B"},{"question":"Alternative to chemical fertilizers?","options":["A. Pesticides","B. Industrial waste","C. Natural fertilizers and compost","D. Polythene bags"],"correct":"C"},{"question":"Barrels of crude oil burned daily worldwide?","options":["A. 10 million","B. 50 million","C. 85 million","D. 100 million"],"correct":"C"},{"question":"Gas released when fossil fuels are burned?","options":["A. Oxygen","B. Nitrogen","C. Carbon dioxide","D. Hydrogen"],"correct":"C"},{"question":"When did the cyclone hit North Delhi (Amitav Ghosh)?","options":["A. March 26, 1971","B. March 17, 1978","C. May 1, 1886","D. February 21, 1952"],"correct":"B"},{"question":"In 3Rs, 'Reduce' means?","options":["A. Buy more items","B. Create less waste","C. Burn garbage","D. Throw away things"],"correct":"B"},{"question":"CNG stands for?","options":["A. Common Natural Gas","B. Compressed Natural Gas","C. Carbonized New Gas","D. Certified Natural Gas"],"correct":"B"},{"question":"Deforestation strengthens which effect?","options":["A. Photosynthesis","B. The Greenhouse effect","C. Reforestation","D. The Ozone layer"],"correct":"B"}]},{"chapter_number":3,"chapter_name":"Pastimes","topics":["Yoga & Sports","Phelps & Bolt","Technology"],"questions":[{"question":"Yoga is primarily a practice of?","options":["A. Weight lifting","B. Posture and breathing","C. Team sports","D. Fast running"],"correct":"B"},{"question":"Most-decorated Olympian with 22 medals?","options":["A. Usain Bolt","B. Michael Phelps","C. Larissa Latynia","D. Muhammad Ali"],"correct":"B"},{"question":"Bolt's 100m time at 2012 Olympics?","options":["A. 9.50","B. 9.63","C. 9.72","D. 9.85"],"correct":"B"},{"question":"Condition from lack of contact with nature?","options":["A. Insomnia","B. Nature deficit disorder","C. Chronic fatigue","D. Memory loss"],"correct":"B"},{"question":"Organization that surveyed declining outdoor pastimes?","options":["A. UNESCO","B. RSPB","C. BBC","D. NCTB"],"correct":"B"},{"question":"Most popular pastime for Class 5-6 students?","options":["A. Gardening","B. Chatting","C. Watching television","D. Sports"],"correct":"C"},{"question":"What reduced open fields in urban areas?","options":["A. Reforestation","B. Increasing urbanization","C. Heavy rainfall","D. Lack of interest"],"correct":"B"},{"question":"Percentage of teenagers who liked TV in 2010?","options":["A. 41%","B. 48%","C. 52%","D. 25%"],"correct":"C"},{"question":"Why are young people using online programmes more?","options":["A. Bored of TV","B. Technology getting cheaper and easier","C. Too many open fields","D. Parents force them"],"correct":"B"},{"question":"Siyam's future photography wish?","options":["A. Fashion photographer","B. Shoot beautiful Bangladesh as an amateur","C. Sell cameras","D. Work for National Geographic"],"correct":"B"}]},{"chapter_number":4,"chapter_name":"Events and Festivals","topics":["Mother's Day","May Day","21 February","Pahela Boishakh"],"questions":[{"question":"Mother's Day first formal holiday was in which country?","options":["A. UK","B. USA","C. Denmark","D. Italy"],"correct":"B"},{"question":"Which US president announced Mother's Day as a holiday?","options":["A. Roosevelt","B. Wilson","C. Nixon","D. Ford"],"correct":"B"},{"question":"May Day is observed on?","options":["A. March 26","B. February 21","C. May 1","D. December 16"],"correct":"C"},{"question":"May 1, 1886 strike location?","options":["A. London","B. Dhaka","C. Chicago","D. Paris"],"correct":"C"},{"question":"Who declared Urdu only state language of Pakistan in 1948?","options":["A. Sheikh Mujibur Rahman","B. Mohammad Ali Jinnah","C. Rafiqul Islam","D. Kofi Annan"],"correct":"B"},{"question":"UNESCO proclaimed 21 Feb as International Mother Language Day in?","options":["A. 1952","B. 1971","C. 1999","D. 2000"],"correct":"C"},{"question":"Gun salutes for Independence Day in Bangladesh?","options":["A. 21","B. 31","C. 52","D. 71"],"correct":"B"},{"question":"National Mausoleum location?","options":["A. Ramna","B. Motijheel","C. Savar","D. Banani"],"correct":"C"},{"question":"Tagore song sung at sunrise on Pahela Boishakh?","options":["A. Amar Shonar Bangla","B. Esho-he-Boishakh","C. Joy Bangla","D. O Amar Desher Mati"],"correct":"B"},{"question":"Organization at Ramna Batamul on Pahela Boishakh?","options":["A. Bangla Academy","B. Shilpakala Academy","C. Chhayanaut","D. Fine Arts Dept"],"correct":"C"}]},{"chapter_number":5,"chapter_name":"Problems Around Us","topics":["Overcrowding","Population","Child Marriage"],"questions":[{"question":"What happened to the ferry boat in Jamil's story?","options":["A. Reached safely","B. Was stolen","C. Sank in the river","D. Caught fire"],"correct":"C"},{"question":"Bangladesh's world population rank?","options":["A. 5th","B. 8th","C. 10th","D. 12th"],"correct":"B"},{"question":"Why is arable land shrinking in Bangladesh?","options":["A. River erosion only","B. Houses and factories built on it","C. Too many trees","D. Earthquakes"],"correct":"B"},{"question":"How old was Lipi when marriage was arranged?","options":["A. 12","B. 14","C. 16","D. 18"],"correct":"B"},{"question":"Where is Lipi studying now?","options":["A. Dhaka University","B. Carmichael College, Rangpur","C. Mymensingh College","D. Rajshahi College"],"correct":"B"},{"question":"Why is English important for hotel/airline jobs?","options":["A. National language","B. Common language for global communication","C. Required for math","D. Easier than Bangla"],"correct":"B"},{"question":"What makes the world feel 'smaller'?","options":["A. Walking","B. Speedy transports and the Internet","C. Less population","D. Mountains"],"correct":"B"},{"question":"'Density of population' means?","options":["A. Total people in a country","B. Number of people per sq. km","C. Number of births","D. Number of deaths"],"correct":"B"},{"question":"Estimated Bangladesh population in 2050?","options":["A. 150m","B. 197m","C. 217m","D. 250m"],"correct":"C"},{"question":"Main consequence of early marriage for Lipi?","options":["A. Becomes wealthy","B. Health hazards and stopped education","C. Travels the world","D. Learns to cook"],"correct":"B"}]},{"chapter_number":6,"chapter_name":"Our Neighbours","topics":["Nepal","Sri Lanka","Maldives","India","Bhutan"],"questions":[{"question":"Capital of Nepal?","options":["A. Pokhara","B. Bhaktapur","C. Kathmandu","D. Patan"],"correct":"C"},{"question":"'Teardrop of India'?","options":["A. Maldives","B. Bhutan","C. Sri Lanka","D. Nepal"],"correct":"C"},{"question":"Largest export of Sri Lanka?","options":["A. Rice","B. Tea","C. Rubber","D. Spices"],"correct":"B"},{"question":"Number of islands in the Maldives?","options":["A. 500","B. 800","C. 1199","D. 2000"],"correct":"C"},{"question":"When did Maldivians convert to Sunni Islam?","options":["A. 10th century","B. 12th century","C. 14th century","D. 16th century"],"correct":"B"},{"question":"Who founded the Delhi Sultanate in 1206?","options":["A. Ashoka","B. Qutbuddin Aybeck","C. Akbar","D. Warren Hastings"],"correct":"B"},{"question":"Bhutan's success metric?","options":["A. Gross National Product","B. Gross National Happiness","C. Per Capita Income","D. Literacy Rate"],"correct":"B"},{"question":"Official name of Bhutan?","options":["A. Druk-yul","B. Thimphu","C. Kira","D. Gho"],"correct":"A"},{"question":"Bhutan's required forest cover by constitution?","options":["A. 40%","B. 50%","C. 60%","D. 75%"],"correct":"C"},{"question":"Smallest Asian country in population and size?","options":["A. Bhutan","B. Nepal","C. The Maldives","D. Sri Lanka"],"correct":"C"}]},{"chapter_number":7,"chapter_name":"People Who Stand Out","topics":["Zainul Abedin","Partha Pratim","Mother Teresa"],"questions":[{"question":"Zainul Abedin's title?","options":["A. Bangabandhu","B. Shilpacharya","C. Sher-e-Bangla","D. Kabi Guru"],"correct":"B"},{"question":"Sketches that made Zainul Abedin famous in 1944?","options":["A. Rebel Cow","B. Bengal Famine Sketches","C. Study of a Crow","D. Monpura"],"correct":"B"},{"question":"Zainul Abedin's folk museum location (1975)?","options":["A. Dhaka","B. Mymensingh","C. Sonargaon","D. Kishoregonj"],"correct":"C"},{"question":"Pioneer of miming in Bangladesh?","options":["A. Zainul Abedin","B. Partha Pratim Majumder","C. Jogesh Dutta","D. Loic Moreau"],"correct":"B"},{"question":"Highest French Theatre accolade received by Partha Pratim?","options":["A. Ekushey Padak","B. The Moliere Award","C. Chevalier award","D. Nobel Prize"],"correct":"B"},{"question":"Mother Teresa's birth name?","options":["A. Agnes Gonxha Bojaxhiu","B. Mary Teresa","C. Julia Ward","D. Rhea"],"correct":"A"},{"question":"Age when Mother Teresa left home to be a missionary?","options":["A. 12","B. 15","C. 18","D. 21"],"correct":"C"},{"question":"Meaning of 'Nirmal Hriday'?","options":["A. Kind Spirit","B. Pure Heart","C. Holy Soul","D. Sweet Home"],"correct":"B"},{"question":"Which nuns did Mother Teresa first join?","options":["A. Missionaries of Charity","B. Sisters of Loreto","C. Blessed Virgin Mary","D. Catholic Merchants"],"correct":"B"},{"question":"Partha Pratim's first solo show (1979) city?","options":["A. Kolkata","B. Paris","C. Dhaka (Shilpakala Academy)","D. New York"],"correct":"C"}]},{"chapter_number":8,"chapter_name":"World Heritage","topics":["Shat Gombuj Mosque","Statue of Liberty","Lake Baikal"],"questions":[{"question":"Shat Gombuj Mosque location?","options":["A. Dhaka","B. Bagerhat","C. Khulna","D. Chittagong"],"correct":"B"},{"question":"Who founded Khalifatabad (Bagerhat)?","options":["A. Khan Jahan Ali","B. Shah Jalal","C. Alauddin Husain Shah","D. Isa Khan"],"correct":"A"},{"question":"Actual number of domes in Shat Gombuj Mosque?","options":["A. 60","B. 70","C. 77","D. 81"],"correct":"C"},{"question":"Statue of Liberty was gifted by which country?","options":["A. UK","B. France","C. Germany","D. Italy"],"correct":"B"},{"question":"Year Statue of Liberty was dedicated?","options":["A. 1776","B. 1884","C. 1886","D. 1924"],"correct":"C"},{"question":"Statue of Liberty's left hand holds?","options":["A. A torch","B. A tablet","C. A sword","D. A flower"],"correct":"B"},{"question":"Deepest and oldest lake in the world?","options":["A. Lake Superior","B. Lake Baikal","C. Lake Victoria","D. Lake Caspian"],"correct":"B"},{"question":"Location of Lake Baikal?","options":["A. Canada","B. USA","C. Russia (Siberia)","D. China"],"correct":"C"},{"question":"Maximum depth of Lake Baikal?","options":["A. 1000m","B. 1642m","C. 2000m","D. 2500m"],"correct":"B"},{"question":"% of world surface fresh water in Lake Baikal?","options":["A. 10%","B. 20%","C. 30%","D. 50%"],"correct":"B"}]},{"chapter_number":9,"chapter_name":"Unconventional Jobs","topics":["Freelancing","Digital Marketing","Self-employment"],"questions":[{"question":"Example of an unconventional job?","options":["A. Doctor","B. Engineer","C. Professional YouTuber/Freelancer","D. Teacher"],"correct":"C"},{"question":"Why are people moving to unconventional jobs?","options":["A. No other jobs","B. Pursuit of passion and flexibility","C. They are easy","D. No education needed"],"correct":"B"},{"question":"What is 'freelancing'?","options":["A. A government job","B. Working for oneself rather than a specific employer","C. Working for free","D. A type of hobby"],"correct":"B"},{"question":"Most important skill for a digital marketer?","options":["A. Cooking","B. Understanding online algorithms and data","C. Physical strength","D. Agriculture"],"correct":"B"},{"question":"What does a 'Media Buyer' do?","options":["A. Buys TV channels","B. Purchases advertising space and time","C. Sells newspapers","D. Works as a reporter"],"correct":"B"},{"question":"Self-employment helps reduce?","options":["A. Literacy","B. Unemployment","C. Population","D. Pollution"],"correct":"B"},{"question":"Platform for Meta Ads work?","options":["A. YouTube","B. Facebook/Instagram","C. LinkedIn","D. Twitter"],"correct":"B"},{"question":"Benefit of working from home?","options":["A. More travel time","B. Flexible working hours","C. Higher office rent","D. Formal dress code"],"correct":"B"},{"question":"An 'Influencer' primarily uses?","options":["A. Machines","B. Social Media reach","C. Physical shops","D. Government funds"],"correct":"B"},{"question":"'E-commerce' refers to?","options":["A. Farming","B. Online buying and selling","C. Electrical engineering","D. Eco-friendly mining"],"correct":"B"}]},{"chapter_number":10,"chapter_name":"Dreams","topics":["Pritilata Waddedar","Langston Hughes","D.H. Lawrence"],"questions":[{"question":"First woman to lead armed attack against British?","options":["A. Mother Teresa","B. Pritilata Waddedar","C. Sarojini Naidu","D. Sultana Kamal"],"correct":"B"},{"question":"Pritilata taught at which school?","options":["A. St. Mary's School","B. Nandankanan Aparnacharan School","C. Dhaka College","D. Eden College"],"correct":"B"},{"question":"Club Pritilata's team attacked?","options":["A. Dhaka Club","B. Pahartali European Club","C. Chittagong Boat Club","D. Army Club"],"correct":"B"},{"question":"How did Pritilata die to avoid arrest?","options":["A. Shooting","B. Hanging","C. Swallowing potassium cyanide","D. Drowning"],"correct":"C"},{"question":"If dreams die, life is like a?","options":["A. Flying bird","B. Broken-winged bird","C. Blooming flower","D. Sunny day"],"correct":"B"},{"question":"Langston Hughes: life without dreams is like a field?","options":["A. Green","B. Full of crops","C. Frozen with snow","D. Flooded"],"correct":"C"},{"question":"Who wrote 'dreamers of the day are dangerous men'?","options":["A. Langston Hughes","B. D.H. Lawrence","C. Walt Whitman","D. Robert Frost"],"correct":"B"},{"question":"D.H. Lawrence: night dreams wake to find?","options":["A. Reality","B. Vanity","C. Success","D. Life"],"correct":"B"},{"question":"Pahartali European Club signboard?","options":["A. Welcome all","B. Dogs and Indians not allowed","C. Only British allowed","D. No Entry"],"correct":"B"},{"question":"Pritilata's subject at Bethune College?","options":["A. Math","B. Physics","C. Philosophy","D. English"],"correct":"C"}]},{"chapter_number":11,"chapter_name":"Reading from English Literature","topics":["The Selfish Giant","Stopping by Woods","Under the Greenwood Tree"],"questions":[{"question":"Author of 'The Selfish Giant'?","options":["A. Robert Frost","B. Oscar Wilde","C. Shakespeare","D. Walt Whitman"],"correct":"B"},{"question":"Why did the Giant build a wall?","options":["A. Protect flowers","B. Keep the children out","C. Stop the wind","D. Hide gold"],"correct":"B"},{"question":"What season stayed in the Giant's garden?","options":["A. Summer","B. Autumn","C. Winter","D. Monsoon"],"correct":"C"},{"question":"Author of 'Stopping by Woods on a Snowy Evening'?","options":["A. Oscar Wilde","B. Robert Frost","C. William Wordsworth","D. Langston Hughes"],"correct":"B"},{"question":"Famous last line of Frost's poem?","options":["A. Woods are lovely","B. And miles to go before I sleep","C. Whose woods these are","D. The horse thinks it queer"],"correct":"B"},{"question":"Why does the horse shake harness bells?","options":["A. He is hungry","B. To ask if there is some mistake","C. He is scared","D. He wants to run"],"correct":"B"},{"question":"Author of 'Under the Greenwood Tree'?","options":["A. John Keats","B. William Shakespeare","C. Lord Byron","D. P.B. Shelley"],"correct":"B"},{"question":"Only enemy in 'Under the Greenwood Tree'?","options":["A. Wild animals","B. Winter and rough weather","C. Selfish people","D. Hunger"],"correct":"B"},{"question":"When children returned to Giant's garden?","options":["A. Giant chased them","B. Trees bloomed/Spring came","C. It started snowing","D. Giant died"],"correct":"B"},{"question":"What Giant saw in the farthest corner?","options":["A. A treasure chest","B. A little boy who couldn't climb a tree","C. A dragon","D. A beautiful flower"],"correct":"B"}]},{"chapter_number":12,"chapter_name":"Roots","topics":["Sense of belonging","Haripada Kapali","Return to roots"],"questions":[{"question":"'Roots' in this chapter means?","options":["A. Plant roots","B. Family and home origin","C. Mathematical roots","D. Underground cables"],"correct":"B"},{"question":"Why do people risk lives to go home during Eid?","options":["A. For free food","B. Irresistible pull of the roots","C. Show off wealth","D. Lack of city jobs"],"correct":"B"},{"question":"People with no roots?","options":["A. Are happy","B. Lack identity and become non-entities","C. Travel more","D. Save money"],"correct":"B"},{"question":"Who is Haripada Kapali?","options":["A. A famous singer","B. A farmer who developed a new rice variety","C. A politician","D. A teacher"],"correct":"B"},{"question":"Haripada's rice variety name?","options":["A. BRRI-28","B. Haridhan","C. Miniket","D. Najirshail"],"correct":"B"},{"question":"Haripada Kapali's district?","options":["A. Dhaka","B. Jhenaidah","C. Sylhet","D. Chittagong"],"correct":"B"},{"question":"Why did Haripada keep different-looking seeds separate?","options":["A. Was scared","B. Saw potential as a new variety","C. Wanted to eat it","D. By mistake"],"correct":"B"},{"question":"Mainul Islam's story is about?","options":["A. A doctor","B. Educated man returning to farming","C. A pilot","D. A businessman"],"correct":"B"},{"question":"'Home is where the heart is' means?","options":["A. Hearts kept at home","B. Emotional connection to home","C. Living in a hospital","D. Heart surgery"],"correct":"B"},{"question":"Haripada's discovery came from?","options":["A. Luck only","B. Keen observation and root-level wisdom","C. University degree","D. Government fund"],"correct":"B"}]},{"chapter_number":13,"chapter_name":"Loneliness","topics":["Social isolation","Elderly loneliness","The Luncheon"],"questions":[{"question":"Primary theme of this chapter?","options":["A. Friendship","B. Loneliness and isolation","C. Business","D. Travel"],"correct":"B"},{"question":"Author of 'The Luncheon'?","options":["A. Oscar Wilde","B. Somerset Maugham","C. Robert Frost","D. Mark Twain"],"correct":"B"},{"question":"Where did the luncheon take place?","options":["A. A small café","B. Foyot's restaurant","C. Narrator's home","D. In a park"],"correct":"B"},{"question":"Woman's favorite phrase at the meal?","options":["A. I am very hungry","B. I never eat anything for luncheon","C. The food is bad","D. I want everything"],"correct":"B"},{"question":"First expensive food the woman ordered?","options":["A. Bread","B. Salmon","C. Caviar","D. Asparagus"],"correct":"C"},{"question":"How did the narrator feel as the bill grew?","options":["A. Happy","B. Panic-stricken","C. Angry","D. Sleepy"],"correct":"B"},{"question":"Narrator's own order?","options":["A. Steak","B. A mutton chop","C. Fish","D. Salad"],"correct":"B"},{"question":"The woman's weight twenty years later?","options":["A. 50 kg","B. 21 stone","C. 10 stone","D. 100 pounds"],"correct":"B"},{"question":"Loneliness is significant for which group?","options":["A. Infants","B. Teenagers","C. The elderly","D. Young adults"],"correct":"C"},{"question":"Narrator's 'revenge' at end of 'The Luncheon'?","options":["A. Sued the lady","B. The lady became very fat","C. Got money back","D. Ignored her"],"correct":"B"}]},{"chapter_number":14,"chapter_name":"Renewable Energy","topics":["Solar","Wind","Hydro energy"],"questions":[{"question":"Non-renewable energy source?","options":["A. Sun","B. Wind","C. Coal","D. Water"],"correct":"C"},{"question":"Renewable energy is?","options":["A. Energy that runs out","B. Energy naturally replenished","C. Energy from burning wood","D. Expensive energy"],"correct":"B"},{"question":"'Photovoltaic' relates to?","options":["A. Windmills","B. Solar panels","C. Dams","D. Gas plants"],"correct":"B"},{"question":"Cleanest energy source?","options":["A. Oil","B. Gas","C. Solar","D. Coal"],"correct":"C"},{"question":"Hydro-electric power is from?","options":["A. Fire","B. Falling water","C. Blowing wind","D. Hot rocks"],"correct":"B"},{"question":"Disadvantage of fossil fuels?","options":["A. They are free","B. Cause pollution and global warming","C. They are infinite","D. They are clean"],"correct":"B"},{"question":"Solar energy available as long as?","options":["A. We have batteries","B. The sun shines","C. There is wind","D. We have coal"],"correct":"B"},{"question":"Wind turbines convert kinetic energy into?","options":["A. Heat","B. Electricity","C. Sound","D. Water"],"correct":"B"},{"question":"'Geothermal' energy comes from?","options":["A. Moon","B. Earth's internal heat","C. Trash","D. Plants"],"correct":"B"},{"question":"European leader in wind energy?","options":["A. Bangladesh","B. Germany","C. Denmark","D. Italy"],"correct":"C"}]},{"chapter_number":15,"chapter_name":"Media and E-communication","topics":["Email","Social Media","Digital Communication"],"questions":[{"question":"'E-communication' is?","options":["A. Face to face talk","B. Electronic communication","C. Writing letters on paper","D. Using signs"],"correct":"B"},{"question":"'Email' stands for?","options":["A. Easy mail","B. Electronic mail","C. Expert mail","D. End mail"],"correct":"B"},{"question":"Popular social networking site?","options":["A. Google Search","B. Facebook","C. MS Word","D. Calculator"],"correct":"B"},{"question":"What is a 'blog'?","options":["A. A type of virus","B. Online personal journal or discussion site","C. A hardware part","D. A search engine"],"correct":"B"},{"question":"Internet changed communication by making it?","options":["A. Slower","B. Instant and global","C. More expensive","D. Impossible"],"correct":"B"},{"question":"'Cyberspace' is?","options":["A. Outer space","B. Virtual environment of computer networks","C. A physical room","D. A library"],"correct":"B"},{"question":"A 'smartphone' is?","options":["A. A phone that can only call","B. Mobile phone with advanced computing features","C. A television","D. A radio"],"correct":"B"},{"question":"Communication via video link is called?","options":["A. Radio","B. Video conferencing","C. Texting","D. Mailing"],"correct":"B"},{"question":"Main risk of oversharing on social media?","options":["A. Getting more likes","B. Privacy breach","C. Faster internet","D. Saving storage"],"correct":"B"},{"question":"'Global Village' is fueled by?","options":["A. Agriculture","B. Information Technology","C. Shipping","D. Mining"],"correct":"B"}]},{"chapter_number":16,"chapter_name":"Graffiti","topics":["Graffiti as art","Social commentary","Vandalism vs Public art"],"questions":[{"question":"What is graffiti?","options":["A. A type of food","B. Writing/drawings on a public wall","C. A classical dance","D. A scientific tool"],"correct":"B"},{"question":"Graffiti is often considered as?","options":["A. Legal business","B. Vandalism","C. Mandatory","D. Education"],"correct":"B"},{"question":"Graffiti is often used for?","options":["A. Cooking","B. Social or political commentary","C. Teaching math","D. Construction"],"correct":"B"},{"question":"Famous anonymous graffiti artist?","options":["A. Picasso","B. Banksy","C. Van Gogh","D. Da Vinci"],"correct":"B"},{"question":"Graffiti has roots in?","options":["A. Modern computers","B. Ancient times (Cave paintings/Rome)","C. Recent 2020s","D. Factories"],"correct":"B"},{"question":"Graffiti artist's 'canvas'?","options":["A. Paper","B. Public walls/buildings","C. Mobile screen","D. Cloth"],"correct":"B"},{"question":"Street art can help by?","options":["A. Destroying cities","B. Beautifying urban areas and expressing identity","C. Increasing pollution","D. Stopping internet"],"correct":"B"},{"question":"Is all graffiti illegal?","options":["A. Yes, always","B. No, some are commissioned public art","C. Yes, crime everywhere","D. No, required by law"],"correct":"B"},{"question":"Most common tool for modern graffiti?","options":["A. Pen","B. Spray paint","C. Pencil","D. Hammer"],"correct":"B"},{"question":"'Subway Art' graffiti found in?","options":["A. Parks","B. Underground train systems","C. Rooftops","D. Schools"],"correct":"B"}]}]};
+
+let currentChapter=null,currentQ=0,score=0,answered=false;
+
+function buildHome(){
+  const grid=document.getElementById('chapterGrid');
+  grid.innerHTML='';
+  data.chapters.forEach((ch,idx)=>{
+    const card=document.createElement('div');
+    card.className='chapter-card';
+    card.onclick=()=>startQuiz(idx);
+    card.innerHTML=`<div class="chapter-num">${ch.chapter_number}</div><div class="chapter-info"><h3>${ch.chapter_name}</h3><p>${ch.topics.join(' · ')} · ${ch.questions.length} questions</p></div><div class="chapter-arrow">›</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function startQuiz(idx){
+  currentChapter=idx; currentQ=0; score=0;
+  showScreen('quizScreen');
+  const ch=data.chapters[idx];
+  document.getElementById('quizChapterName').textContent=ch.chapter_name;
+  document.getElementById('quizChapterSub').textContent=`Chapter ${ch.chapter_number} · ${ch.questions.length} Questions`;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const ch=data.chapters[currentChapter],q=ch.questions[currentQ];
+  answered=false;
+  const total=ch.questions.length;
+  document.getElementById('qCounter').textContent=`Question ${currentQ+1} of ${total}`;
+  document.getElementById('qText').textContent=q.question;
+  document.getElementById('progressFill').style.width=`${(currentQ/total)*100}%`;
+  const container=document.getElementById('optionsContainer');
+  container.innerHTML='';
+  ['A','B','C','D'].forEach((letter,i)=>{
+    const btn=document.createElement('button');
+    btn.className='option-btn';
+    btn.onclick=()=>selectAnswer(btn,letter,q.correct);
+    btn.innerHTML=`<span class="option-letter">${letter}</span> ${q.options[i].substring(3)}`;
+    container.appendChild(btn);
+  });
+  document.getElementById('feedbackBox').className='feedback';
+  document.getElementById('nextBtn').classList.remove('visible');
+}
+
+function selectAnswer(btn,chosen,correct){
+  if(answered)return;
+  answered=true;
+  const allBtns=document.querySelectorAll('.option-btn');
+  allBtns.forEach(b=>b.disabled=true);
+  ['A','B','C','D'].forEach((l,i)=>{
+    if(l===correct)allBtns[i].classList.add('correct');
+    else if(l===chosen&&chosen!==correct)allBtns[i].classList.add('wrong');
+  });
+  const fb=document.getElementById('feedbackBox');
+  if(chosen===correct){score++;fb.className='feedback correct';fb.innerHTML='✅ Correct! Well done.';}
+  else{fb.className='feedback wrong';fb.innerHTML=`❌ Wrong! Correct answer is <strong>${correct}</strong>.`;}
+  document.getElementById('nextBtn').classList.add('visible');
+  document.getElementById('nextBtn').textContent=currentQ===data.chapters[currentChapter].questions.length-1?'See Results 🏆':'Next Question →';
+}
+
+function nextQuestion(){
+  if(currentQ<data.chapters[currentChapter].questions.length-1){currentQ++;renderQuestion();}
+  else showResult();
+}
+
+function showResult(){
+  const total=data.chapters[currentChapter].questions.length,pct=Math.round((score/total)*100);
+  const map=pct>=80?['🏆','Excellent!','You really know this chapter!']:pct>=60?['👍','Good Job!','A little more practice and you will ace it!']:pct>=40?['📖','Keep Studying!','Review the chapter and try again.']:['💪',"Don't Give Up!",'Read carefully and retry.'];
+  document.getElementById('resultEmoji').textContent=map[0];
+  document.getElementById('resultTitle').textContent=map[1];
+  document.getElementById('resultSubtitle').textContent=map[2];
+  document.getElementById('scoreNum').textContent=`${pct}%`;
+  document.getElementById('correctCount').textContent=score;
+  document.getElementById('wrongCount').textContent=total-score;
+  document.getElementById('totalCount').textContent=total;
+  const deg=(pct/100)*360;
+  document.getElementById('scoreCircle').style.background=`conic-gradient(var(--accent) ${deg}deg,rgba(255,255,255,0.05) ${deg}deg)`;
+  document.getElementById('retryBtn').onclick=()=>startQuiz(currentChapter);
+  showScreen('resultScreen');
+}
+
+function goHome(){showScreen('homeScreen');}
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+buildHome();
+</script>
+</body>
+</html>
